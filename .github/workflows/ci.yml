@@ -44,5 +44,5 @@ jobs:
         run: docker pull hqdu/tapfrontend:latest  
 
       - name: Deploy with Docker Compose
-        working-directory: /home/hqdu/CICDdocker
+        working-directory: /home/hqdu/app1
         run: docker compose up -d --force-recreate
