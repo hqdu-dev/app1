@@ -1,8 +1,9 @@
 const express = require('express');
-const router = express.Router();
-module.exports = router;
-
 const authController = require('../controllers/auth.controller');
 
-router.post('/login', authController.longin);
+const router = express.Router();
+
+// API đăng nhập
+router.post('/login', authController.login);
+
 module.exports = router;
