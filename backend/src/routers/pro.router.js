@@ -1,14 +1,16 @@
-const express=require('express');
-const proController=require('../controllers/pro.controller');
+const express = require('express');
+const proController = require('../controllers/pro.controller');
 
-const router=express.Router();
+const authMiddleware = require('../middlewares/auth.middleware');
+const checkPermission = require('../middlewares/permission.middleware');
 
-const {getPros,getProById,createPro,updatePro,deletePro}=require('../controllers/pro.controller');
+const router = express.Router();
 
-router.get('/',getPros);
-router.get('/:id',getProById);
-router.post('/',createPro);
-router.put('/:id',updatePro);
-router.delete('/:id',deletePro);
+router.get('/', authMiddleware, checkPermission('products.read'), proController.getPros);
+router.get('/:id', authMiddleware, checkPermission('products.read'), proController.getProById);
 
-module.exports=router;
+router.post('/', authMiddleware, checkPermission('products.create'), proController.createPro);
+router.put('/:id', authMiddleware, checkPermission('products.update'), proController.updatePro);
+router.delete('/:id', authMiddleware, checkPermission('products.delete'), proController.deletePro);
+
+module.exports = router;
