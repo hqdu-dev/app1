@@ -13,16 +13,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-     
-      
-      - name: Build Docker image
-        run: docker build -t hqdu/tapbackend:latest .
+      # ĐÃ XÓA BƯỚC NPM INSTALL NGOÀI MÁY RUNNER VÌ DOCKERFILE ĐÃ TỰ LÀM
 
-      - name: Push Docker image
+      # Build backend từ thư mục ./backend
+      - name: Build Backend Docker image
+        run: docker build -t hqdu/tapbackend:latest ./backend
+
+      - name: Push Backend Docker image
         run: docker push hqdu/tapbackend:latest
 
+      # Build frontend từ thư mục ./frontend
       - name: Build frontend Docker image
-        run: docker build -t hqdu/tapfrontend:latest .  
+        run: docker build -t hqdu/tapfrontend:latest ./frontend  
 
       - name: Push frontend Docker image
         run: docker push hqdu/tapfrontend:latest  
@@ -43,7 +45,4 @@ jobs:
 
       - name: Deploy with Docker Compose
         working-directory: /home/hqdu/CICDdocker
-       
         run: docker compose up -d --force-recreate
-
-     
