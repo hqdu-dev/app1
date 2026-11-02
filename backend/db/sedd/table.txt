@@ -1,13 +1,19 @@
-CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
-CREATE TABLE IF NOT EXISTS products (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(200) NOT NULL,
-    price NUMERIC(12, 2) NOT NULL CHECK (price >= 0),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- Dữ liệu người dùng
+INSERT INTO users (name, email) VALUES
+('Nguyen Van An', 'an@gmail.com'),
+('Tran Thi Binh', 'binh@gmail.com'),
+('Le Van Cuong', 'cuong@gmail.com'),
+('Pham Thi Dung', 'dung@gmail.com'),
+('Hoang Van Nam', 'nam@gmail.com');
+
+-- Dữ liệu sản phẩm
+INSERT INTO products (name, price) VALUES
+('iPhone 16', 22000000),
+('Samsung Galaxy S25', 19000000),
+('MacBook Air M4', 28000000),
+('Dell XPS 13', 32000000),
+('iPad Air', 15000000),
+('AirPods Pro 2', 5500000),
+('Logitech Mouse', 850000),
+('Mechanical Keyboard', 1800000);

@@ -3,6 +3,7 @@ const express = require("express");
 const userRouter = require("./routers/user.router");
 const proRouter = require("./routers/pro.router");
 const { deleteUser } = require("./models/user.model");
+const authRouter = require("./routers/auth.router");
 
 const app = express();
 
