@@ -1,48 +1,77 @@
+
+# Tên workflow
 name: app1
 
+# Tự động chạy khi push code lên nhánh dev
 on:
   push:
     branches:
       - dev
 
 jobs:
+
+  # =====================================
+  # JOB 1: BUILD VÀ PUSH DOCKER IMAGE
+  # =====================================
   build:
     runs-on: self-hosted
 
     steps:
+
+      # Lấy source code từ GitHub về Runner
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      # ĐÃ XÓA BƯỚC NPM INSTALL NGOÀI MÁY RUNNER VÌ DOCKERFILE ĐÃ TỰ LÀM
-
-      # Build backend từ thư mục ./backend
+      # Build Backend từ thư mục ./backend
       - name: Build Backend Docker image
         run: docker build -t hqdu/tapbackend:latest ./backend
 
+      # Push Backend Image lên Docker Hub
       - name: Push Backend Docker image
         run: docker push hqdu/tapbackend:latest
 
-      # Build frontend từ thư mục ./frontend
-      - name: Build frontend Docker image
-        run: docker build -t hqdu/tapfrontend:latest ./frontend  
+      # Build Frontend từ thư mục ./frontend
+      - name: Build Frontend Docker image
+        run: docker build -t hqdu/tapfrontend:latest ./frontend
 
-      - name: Push frontend Docker image
-        run: docker push hqdu/tapfrontend:latest  
+      # Push Frontend Image lên Docker Hub
+      - name: Push Frontend Docker image
+        run: docker push hqdu/tapfrontend:latest
 
+  # =====================================
+  # JOB 2: DEPLOY LÊN UBUNTU SERVER
+  # =====================================
   deploy:
     runs-on: self-hosted
+
+    # Chỉ Deploy khi Job build thành công
     needs: build
 
     steps:
+
+      # Lấy source code từ GitHub
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Pull latest image
+      # Tải Backend Image mới nhất
+      - name: Pull Backend Docker image
         run: docker pull hqdu/tapbackend:latest
 
-      - name: Pull latest frontend image
-        run: docker pull hqdu/tapfrontend:latest  
+      # Tải Frontend Image mới nhất
+      - name: Pull Frontend Docker image
+        run: docker pull hqdu/tapfrontend:latest
 
+      # Chạy lại Backend và Frontend bằng Docker Compose
+      # Không khởi động lại PostgreSQL
       - name: Deploy with Docker Compose
         working-directory: /home/hqdu/app1
-        run: docker compose up -d --force-recreate
+        run: |
+          docker compose up -d \
+            --no-deps \
+            --force-recreate \
+            backend frontend
+
+      # Kiểm tra trạng thái các container
+      - name: Check containers
+        working-directory: /home/hqdu/app1
+        run: docker compose ps

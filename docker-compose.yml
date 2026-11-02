@@ -1,7 +1,9 @@
-version: '3.8'
+
+name: app1
+
 services:
- postgres:
-    image: postgres:13
+  postgres:
+    image: postgres:18
     container_name: postgres
     restart: always
     env_file:
@@ -13,11 +15,17 @@ services:
     ports:
       - "${DB_PORT}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
+   
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
- backend:
+  backend:
     image: hqdu/tapbackend:latest
     container_name: app1-backend
     restart: always
@@ -26,10 +34,12 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
-      - app-network    
- frontend:
+      - app-network
+
+  frontend:
     image: hqdu/tapfrontend:latest
     container_name: app1-frontend
     restart: always
@@ -40,10 +50,11 @@ services:
     depends_on:
       - backend
     networks:
-      - app-network     
+      - app-network
 
 volumes:
   postgres_data:
+
 networks:
   app-network:
     driver: bridge
