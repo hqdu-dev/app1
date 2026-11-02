@@ -3,14 +3,12 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const login = async ({ email, password }) => {
-    // 1. Tìm tài khoản
     const user = await authModel.findUserByEmail(email);
 
     if (!user) {
         throw new Error("Email hoặc mật khẩu không đúng");
     }
 
-    // 2. Kiểm tra mật khẩu
     const isMatch = await bcrypt.compare(
         password,
         user.password_hash
@@ -20,17 +18,22 @@ const login = async ({ email, password }) => {
         throw new Error("Email hoặc mật khẩu không đúng");
     }
 
-    // 3. Tạo JWT
     const token = jwt.sign(
         { id: user.id },
         process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN }
     );
 
-    // 4. Trả kết quả
+    const userAccess = await authModel.findUserAccessById(user.id);
+
+    if (!userAccess) {
+        throw new Error("Không tìm thấy thông tin người dùng");
+    }
+
     return {
         message: "Đăng nhập thành công",
-        token
+        token,
+        user: userAccess
     };
 };
 
